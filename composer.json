@@ -1,0 +1,15 @@
+{
+    "name": "creativestyle/magesuite-warmup-customer-credentials-generator",
+    "description": "Extension for generating customer credentials used in warmup processes",
+    "type": "magento2-module",
+    "homepage": "https://creativestyle.de",
+    "license": "OSL-3.0",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "MageSuite\\WarmupCustomerCredentialsGenerator\\": ""
+        }
+    }
+}
