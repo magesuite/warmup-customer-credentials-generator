@@ -40,20 +40,28 @@ class CustomerManager
      */
     protected $groupManagement;
 
+    /**
+     * @var \Magento\Customer\Api\CustomerMetadataInterface
+     */
+    protected $customerMetadata;
+
     public function __construct(
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Magento\Customer\Model\ResourceModel\Customer $customerResource,
         \Magento\Customer\Api\GroupManagementInterface $groupManagement,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-    ) {
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Customer\Api\CustomerMetadataInterface $customerMetadata
+    )
+    {
         $this->customerFactory = $customerFactory;
         $this->customerRepository = $customerRepository;
         $this->customerResource = $customerResource;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->groupManagement = $groupManagement;
+        $this->customerMetadata = $customerMetadata;
     }
 
     public function getCustomer(string $email): ?\Magento\Customer\Api\Data\CustomerInterface
@@ -88,7 +96,8 @@ class CustomerManager
         int $groupId,
         string $email,
         string $password
-    ): \Magento\Customer\Model\Customer {
+    ): \Magento\Customer\Model\Customer
+    {
         return $this->customerFactory->create([
             'data' => $this->createCustomerData(
                 $storeId,
@@ -104,16 +113,33 @@ class CustomerManager
         int $groupId,
         string $email,
         string $password
-    ): array {
-        return [
-            'prefix'        => $this->getCustomerRandomNamePrefix(),
-            'firstname'     => 'WarmupCrawler',
-            'lastname'      => sprintf('FakeCustomer-G%dS%d', $groupId, $storeId),
-            'email'         => $email,
-            'password'      => $password,
-            'group_id'      => $groupId,
-            'website_id'    => $this->getStore($storeId)->getWebsiteId(),
+    ): array
+    {
+        $result = [
+            'prefix' => $this->getCustomerRandomNamePrefix(),
+            'firstname' => 'WarmupCrawler',
+            'lastname' => sprintf('FakeCustomer-G%dS%d', $groupId, $storeId),
+            'email' => $email,
+            'password' => $password,
+            'group_id' => $groupId,
+            'website_id' => $this->getStore($storeId)->getWebsiteId(),
         ];
+
+        if ($this->scopeConfig->getValue('customer/address/dob_show') === \Magento\Config\Model\Config\Source\Nooptreq::VALUE_REQUIRED) {
+            $result['dob'] = '1990-01-01';
+        }
+
+        if ($this->scopeConfig->getValue('customer/address/taxvat_show') === \Magento\Config\Model\Config\Source\Nooptreq::VALUE_REQUIRED) {
+            $result['taxvat'] = 'PL1234567890';
+        }
+
+        if ($this->scopeConfig->getValue('customer/address/gender_show') === \Magento\Config\Model\Config\Source\Nooptreq::VALUE_REQUIRED) {
+            $options = $this->customerMetadata->getAttributeMetadata('gender')->getOptions();
+
+            $result['gender'] = $options[1]->getValue();
+        }
+
+        return $result;
     }
 
     protected function getCustomerRandomNamePrefix(): string
