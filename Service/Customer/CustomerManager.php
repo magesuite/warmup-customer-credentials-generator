@@ -86,7 +86,10 @@ class CustomerManager
             $password
         );
 
+        $customerEmail = $customer['email'];
+
         $this->customerResource->save($customer);
+        $this->activateAccount($customerEmail);
 
         return $customer;
     }
@@ -160,5 +163,16 @@ class CustomerManager
     protected function getStore(int $id): ?\Magento\Store\Api\Data\StoreInterface
     {
         return $this->storeManager->getStore($id);
+    }
+
+    /**
+     * @param string $customerEmail
+     */
+    protected function activateAccount($customerEmail)
+    {
+        $customer = $this->customerRepository->get($customerEmail);
+        $customer->setConfirmation(null);
+
+        $this->customerRepository->save($customer);
     }
 }
