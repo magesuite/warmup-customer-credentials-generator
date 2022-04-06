@@ -34,7 +34,7 @@ class CredentialsProviderLazyCreateDecorator implements CredentialsProviderInter
         }
 
         $credentials = $this->upstreamProvider->get($storeId, $customerGroupId);
-        $customer = $this->accountCreator->getCustomer($credentials->getUsername());
+        $customer = $this->accountCreator->getCustomer($credentials->getUsername(), $storeId);
 
         if (!$customer) {
             $customer = $this->accountCreator->createCustomer(
