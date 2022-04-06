@@ -64,10 +64,13 @@ class CustomerManager
         $this->customerMetadata = $customerMetadata;
     }
 
-    public function getCustomer(string $email): ?\Magento\Customer\Api\Data\CustomerInterface
+    public function getCustomer(string $email, int $storeId): ?\Magento\Customer\Api\Data\CustomerInterface
     {
         try {
-            return $this->customerRepository->get($email);
+            $websiteId = $this->getStore($storeId)
+                ->getWebsiteId();
+
+            return $this->customerRepository->get($email, $websiteId);
         } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
             return null;
         }
@@ -89,7 +92,11 @@ class CustomerManager
         $customerEmail = $customer['email'];
 
         $this->customerResource->save($customer);
-        $this->activateAccount($customerEmail);
+
+        $websiteId = $this->getStore($storeId)
+            ->getWebsiteId();
+
+        $this->activateAccount($customerEmail, $websiteId);
 
         return $customer;
     }
@@ -168,9 +175,9 @@ class CustomerManager
     /**
      * @param string $customerEmail
      */
-    protected function activateAccount($customerEmail)
+    protected function activateAccount($customerEmail, $websiteId)
     {
-        $customer = $this->customerRepository->get($customerEmail);
+        $customer = $this->customerRepository->get($customerEmail, $websiteId);
         $customer->setConfirmation(null);
 
         $this->customerRepository->save($customer);
