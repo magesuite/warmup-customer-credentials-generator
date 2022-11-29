@@ -157,7 +157,7 @@ class CustomerManager
         static $prefixes = null;
 
         if (null === $prefixes) {
-            if ($prefixOptions = trim($this->scopeConfig->getValue('customer/address/prefix_options'))) {
+            if ($this->getPrefixOptions() !== null && $prefixOptions = trim($this->getPrefixOptions())) {
                 $prefixes = explode(';', $prefixOptions);
             } else {
                 $prefixes = ['Mr.', 'Ms.'];
@@ -181,5 +181,10 @@ class CustomerManager
         $customer->setConfirmation(null);
 
         $this->customerRepository->save($customer);
+    }
+
+    protected function getPrefixOptions(): ?string
+    {
+        return $this->scopeConfig->getValue('customer/address/prefix_options');
     }
 }
