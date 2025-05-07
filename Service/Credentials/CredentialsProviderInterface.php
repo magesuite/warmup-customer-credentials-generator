@@ -38,5 +38,5 @@ interface CredentialsProviderInterface
      * @param int|null $customerGroupId
      * @return Credentials
      */
-    public function get(int $storeId, int $customerGroupId): ?Credentials;
+    public function get(int $storeId, ?int $customerGroupId = null): ?Credentials;
 }

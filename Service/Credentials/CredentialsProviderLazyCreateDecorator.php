@@ -27,7 +27,7 @@ class CredentialsProviderLazyCreateDecorator implements CredentialsProviderInter
      * @throws \Magento\Framework\Exception\AlreadyExistsException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function get(int $storeId, int $customerGroupId = null): ?Credentials
+    public function get(int $storeId, ?int $customerGroupId = null): ?Credentials
     {
         if (null === $customerGroupId) {
             return null;

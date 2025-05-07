@@ -69,7 +69,7 @@ class DerivedStableCredentialsGenerator implements CredentialsProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function get(int $storeId, int $customerGroupId): ?Credentials
+    public function get(int $storeId, ?int $customerGroupId = null): ?Credentials
     {
         return new Credentials(
             $this->getEmail($storeId, $customerGroupId),
